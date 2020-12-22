@@ -1,22 +1,41 @@
-def pos_neg_split(grad_img, adjust_param=5):
-    """ used to vis grad of one-channel image (gray image)
+import numpy as np
+import torch
 
-    :param grad_img: nd.array, HW
+
+def norm_grad(grads, adjust_param=3):
+    """ used to vis grad of 3-channel image
+
+    :param grads:
+    :param adjust_param:
+    :return:
+    """
+    std = adjust_param * np.std(grads)
+    img = np.clip(grads, a_max=std, a_min=-std)
+    img = (1 + img / std) * 0.5
+
+    return img
+
+
+def pos_neg_split(grads, adjust_param=5):
+    """ used to vis grad of 1-channel image (gray image)
+
+    :param grads: nd.array, HW
+    :param adjust_param:
     :return: split img
     """
-    assert (grad_img.ndim == 2 or grad_img.shape[2] == 1)
+    assert (grads.ndim == 2 or grads.shape[2] == 1)
 
-    new_img = np.ones((*grad_img.shape[:2], 3))
+    new_img = np.ones((*grads.shape[:2], 3))
 
-    pos_scale = 1. / np.max(grad_img) * adjust_param
-    neg_scale = -1. / np.min(grad_img) * adjust_param
+    pos_scale = 1. / np.max(grads) * adjust_param
+    neg_scale = -1. / np.min(grads) * adjust_param
 
-    pos_idx = np.where(grad_img > 0)
-    new_img[..., 1][pos_idx] = 1 - grad_img[pos_idx] * pos_scale
+    pos_idx = np.where(grads > 0)
+    new_img[..., 1][pos_idx] = 1 - grads[pos_idx] * pos_scale
     new_img[..., 2][pos_idx] = new_img[..., 1][pos_idx]
 
-    neg_idx = np.where(grad_img < 0)
-    new_img[..., 1][neg_idx] = 1 + grad_img[neg_idx] * neg_scale
+    neg_idx = np.where(grads < 0)
+    new_img[..., 1][neg_idx] = 1 + grads[neg_idx] * neg_scale
     new_img[..., 0][neg_idx] = new_img[..., 1][neg_idx]
 
     new_img = np.clip(new_img, 0, 1)
@@ -24,9 +43,21 @@ def pos_neg_split(grad_img, adjust_param=5):
     return new_img
 
 
+def vis_imgs_grad(grads: torch.Tensor, channel_num: int):
+    if channel_num == 1:
+        grads = grads.squeeze().cpu().numpy()
+        imgs = [pos_neg_split(g) for g in grads]
+    elif channel_num == 3:
+        grads = grads.squeeze().cpu().permute(0, 2, 3, 1).numpy()
+        imgs = [norm_grad(g) for g in grads]
+    else:
+        raise ValueError('Grad for vis should be 1 or 3 channel.')
+
+    return imgs
+
+
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
-    import numpy as np
     import torch
     import torch.nn as nn
 
@@ -50,8 +81,7 @@ if __name__ == '__main__':
 
     grads = get_grad(model, x, labels, criterion)
 
-    grads = grads.squeeze().cpu().numpy()
-    vis_grad = [pos_neg_split(g) for g in grads]
+    vis_grad = vis_imgs_grad(grads, channel_num=1)
     show_images(images, num_per_col=1, titles=cls)
     show_images(vis_grad, num_per_col=1, titles=cls)
     plt.show()
