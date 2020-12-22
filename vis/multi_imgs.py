@@ -26,3 +26,5 @@ def show_images(images, num_per_col: int = 1, titles: list = None):
         plt.axis('off')
         plt.imshow(image, vmin=0, vmax=1)
         a.set_title(title)
+
+    plt.show()

@@ -62,26 +62,49 @@ if __name__ == '__main__':
     import torch.nn as nn
 
     from models.mnist import MnistCls
+    from models.cifar10 import PreActResNet18
     from utils.net_helper import get_grad
     from utils.vis.multi_imgs import show_images
-    from utils.data_processing import get_random_mnist_samples
+    from utils.data_processing import get_random_mnist_samples,get_random_cifar10_samples
 
     np.random.seed(0)
 
     dataset_dir = '~/torchvision_dataset'
-    images, labels, cls = get_random_mnist_samples(dataset_dir, 5)
-    model = MnistCls()
-    model.load_state_dict(torch.load('weights/2020-12-18-18-47-27_5_64_0.01_0.001_.pth'))
-    model.to('cuda')
-    model.eval()
 
-    criterion = nn.CrossEntropyLoss()
+    def mnist():
+        images, labels, cls = get_random_mnist_samples(dataset_dir, 5)
+        model = MnistCls()
+        model.load_state_dict(torch.load('weights/mnist/mix_train/2020-12-22-18-53-15_10_128_0.01_0.001_.pth'))
+        model.to('cuda')
+        model.eval()
 
-    x = images.unsqueeze(1).to(dtype=torch.float)
+        criterion = nn.CrossEntropyLoss()
 
-    grads = get_grad(model, x, labels, criterion)
+        x = images.unsqueeze(1).to(dtype=torch.float)
 
-    vis_grad = vis_imgs_grad(grads, channel_num=1)
-    show_images(images, num_per_col=1, titles=cls)
-    show_images(vis_grad, num_per_col=1, titles=cls)
-    plt.show()
+        grads = get_grad(model, x, labels, criterion)
+
+        vis_grad = vis_imgs_grad(grads, channel_num=1)
+        show_images(images, num_per_col=1, titles=cls)
+        show_images(vis_grad, num_per_col=1, titles=cls)
+
+
+    def cifar10():
+        images, labels, cls = get_random_cifar10_samples(dataset_dir, 5)
+        model = PreActResNet18()
+        model.load_state_dict(torch.load('weights/cifar10/PreActResNet18_2020-12-02-20-30-28_200_128_0.1_0.001_adv.pth'))
+        model.to('cuda')
+        model.eval()
+
+        criterion = nn.CrossEntropyLoss()
+
+        x = images.to(dtype=torch.float)
+
+        grads = get_grad(model, x, labels, criterion)
+
+        vis_grad = vis_imgs_grad(grads, channel_num=3)
+        show_images(images.permute(0, 2, 3, 1), num_per_col=1, titles=cls)
+        show_images(vis_grad, num_per_col=1, titles=cls)
+
+    cifar10()
+

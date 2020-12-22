@@ -14,8 +14,10 @@ from utils.net_helper import get_device, save_weights
 from utils.net_helper import get_lr_scheduler
 
 
-def train_custom(model: Module, cfg_train: ConfigTrain,
-                 data_loader: DataLoader, save_w: bool = False, dir_w: str = None):
+def train_custom(model: Module,
+                 cfg_train: ConfigTrain, train_loader: DataLoader,
+                 val_loader: DataLoader = None, val_freq: int = None,
+                 dir_w: str = None):
     device = get_device()
     model.to(device)
 
@@ -31,13 +33,13 @@ def train_custom(model: Module, cfg_train: ConfigTrain,
                                     cfg_train.max_lr,
                                     cfg_train.epoch)
 
-    tqdm_bar = tqdm(total=len(data_loader) * cfg_train.epoch,
+    tqdm_bar = tqdm(total=len(train_loader) * cfg_train.epoch,
                     ncols=100, file=sys.stdout)
 
     for i_epoch in range(cfg_train.epoch):
         loss_print = 0
-        for i_batch, batch in enumerate(data_loader):
-            lr = lr_scheduler(i_epoch + (i_batch + 1) / len(data_loader))
+        for i_batch, batch in enumerate(train_loader):
+            lr = lr_scheduler(i_epoch + (i_batch + 1) / len(train_loader))
             optimizer.param_groups[0].update(lr=lr)
 
             inputs = batch[0].to(device)
@@ -64,10 +66,16 @@ def train_custom(model: Module, cfg_train: ConfigTrain,
                                      f'b-loss:{loss.item():<.4f}|'
                                      f'lr: {lr:.5f}')
 
+        if val_loader is not None:
+            # do valuation
+            if i_epoch % val_freq == val_freq - 1:
+                model.eval()
+                test_accuracy(model, val_loader, cfg_train.dataset_norm)
+                model.train()
+
     tqdm_bar.close()
 
-    if save_w:
-        assert dir_w is not None
+    if dir_w is not None:
         save_weights(dir_w, model, cfg_train)
 
 

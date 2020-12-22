@@ -44,6 +44,6 @@ def get_loader(ds_name: str, train: bool, batch_size: int, normed: bool = False)
         raise ValueError('Dataset should be CIFAR10 or MNIST.')
 
     loader = DataLoader(ds, batch_size=batch_size,
-                        shuffle=True, num_workers=4)
+                        shuffle=True, num_workers=4, pin_memory=True)
 
     return loader

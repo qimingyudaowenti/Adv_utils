@@ -39,7 +39,7 @@ def test_accuracy(model, loader_eval, norm, proportion: float = 1.0):
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
 
-            iterator_tqdm.set_description_str(f'{total} examples. '
+            iterator_tqdm.set_description_str(f'Test on {total} examples. '
                                               f'Natural acc-{correct / total:.2%}')
     iterator_tqdm.close()
 

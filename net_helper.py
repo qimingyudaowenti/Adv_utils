@@ -46,6 +46,7 @@ def add_time_prefix(s):
 
 def save_weights(save_dir: str, model: Module,
                  cfg_train: ConfigTrain = None, pth_name: str = None):
+    # TODO: add more info (model name, dataset name, ...)
     if pth_name is None:
         pth_name = '.pth'
     else:
@@ -60,7 +61,7 @@ def save_weights(save_dir: str, model: Module,
         pth_name = cfg_train.model_name + '_' + pth_name
 
     save_dir = Path(save_dir)
-    save_dir.mkdir(parents=True, exist_ok=True)
+    save_dir.mkdir(parents=False, exist_ok=True)
     weights_path = save_dir / pth_name
     torch.save(model.state_dict(), weights_path)
     print('Save weights in {}\n'.format(weights_path))
