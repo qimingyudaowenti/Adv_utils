@@ -14,6 +14,18 @@ def set_seed(seed: int = 0):
     torch.cuda.manual_seed(seed)
 
 
+def get_grad(model, x, y, criterion):
+    x = x.to('cuda')
+    x.requires_grad = True
+    y = y.to('cuda')
+
+    outputs = model(x)
+    loss = criterion(outputs, y)
+    loss.backward()
+
+    return x.grad
+
+
 def get_device():
     if torch.cuda.is_available():
         device = torch.device('cuda:0')
