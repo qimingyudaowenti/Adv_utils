@@ -29,4 +29,5 @@ def get_random_cifar10_samples(dataset_path: str, num: int, train: bool = False)
     f = lambda x: list(cls_dict.keys())[list(cls_dict.values()).index(x)]
     cls = [f(i) for i in labels]
 
+    # NCHW
     return images, labels, cls

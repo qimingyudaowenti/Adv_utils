@@ -64,11 +64,11 @@ def plot_surface(X, Y, Z, C: torch.Tensor, classes: list):
 
     t = np.linspace(0, 1, 2 * cls_num + 1)[1::2]
     fig.colorbar(mappable=surf, format=fmt, ticks=t, shrink=0.8)
+    fig.tight_layout(rect=[0, 0.03, 1, 0.95])
 
 
 def plot_adv_loss_lanscape(model, img, delta, label, label_adv, norm, bound, classes):
     # img shape: [C, H, W]
-
     delta1 = delta
     delta2 = torch.rand_like(delta1) * 2 * bound - bound
 
@@ -80,10 +80,7 @@ def plot_adv_loss_lanscape(model, img, delta, label, label_adv, norm, bound, cla
     for ix, vx in enumerate(x_axis):
         for iy, vy in enumerate(y_axis):
             imgs_interp[ix, iy, ...] = img + vx / bound * delta1 + vy / bound * delta2
-
     size = imgs_interp.size()
-    # diff = imgs_interp[16, 0, ...] -
-    # print(imgs_interp)
     inputs = imgs_interp.reshape(size[0] * size[1], *size[2:])
 
     mean, std = norm
@@ -118,7 +115,7 @@ if __name__ == '__main__':
     from utils.net_helper import *
     from utils.config import classes_mnist
 
-    DATASET = 'CIFAR10'
+    DATASET = 'MNIST'
 
     if DATASET == 'CIFAR10':
         path_weights = 'weights/cifar10/PreActResNet18_2020-12-02-20-30-28_200_128_0.1_0.001_adv.pth'
@@ -129,7 +126,7 @@ if __name__ == '__main__':
         bound = 8 / 255
         classes = classes_cifar10
     elif DATASET == 'MNIST':
-        path_weights = 'weights/mnist/2020-12-22-18-57-59_10_64_0.01_0.001_.pth'
+        path_weights = 'weights/mnist/mix_train/2020-12-22-18-53-15_10_128_0.01_0.001_.pth'
         model = MnistCls()
         norm = norm_mnist
         cfg_attack = cfg_attack_mnist
@@ -162,7 +159,6 @@ if __name__ == '__main__':
 
     # ------ adversarial acc ------
     ims_adv, ims_adv_normed = attacker(x, y)
-    ims_adv = ims_adv.cpu()
     outputs_adv = model(ims_adv_normed)
     _, predicted = torch.max(outputs_adv.data, 1)
     correct = (predicted == y).sum().item()
@@ -170,9 +166,14 @@ if __name__ == '__main__':
           f'images is: {correct / samples_num:.2%}')
 
     # ------ draw landscape of single image ------
+    ims_adv = ims_adv.cpu()
+    predicted = predicted.cpu()
+    deltas = ims_adv - imgs
+
     for i in range(samples_num):
-        delta = ims_adv - imgs
         img = imgs[i]
         label = labels[i]
-        label_adv = predicted.cpu()[i]
-        plot_adv_loss_lanscape(model, img, delta[i], label, label_adv, norm, bound=bound, classes=classes)
+        label_adv = predicted[i]
+        delta = deltas[i]
+        plot_adv_loss_lanscape(model, img, delta, label, label_adv, norm, bound=bound, classes=classes)
+

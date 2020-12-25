@@ -2,7 +2,7 @@ import torch
 
 from utils.config.attack import ConfigAttack
 from utils.attack.step import choose_attack_step
-from utils.attack.norm import InputNormalize
+from utils.data_processing.norm import InputNormalize
 from utils.attack.step import WeakLinfStep
 
 

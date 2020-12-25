@@ -28,3 +28,18 @@ def show_images(images, num_per_col: int = 1, titles: list = None):
         a.set_title(title)
 
     plt.show()
+
+
+def show_grid(img, num_channel=3, norm: tuple = None):
+    npimg = img.numpy()
+    if norm is not None:
+        # TODO:
+        raise NotImplementedError
+    if num_channel == 1:
+        plt.gray()
+        plt.imshow(npimg[0, ...])
+    elif num_channel == 3:
+        plt.imshow(np.transpose(npimg, (1, 2, 0)))
+    else:
+        raise ValueError('Wrong channel number.')
+    plt.show()

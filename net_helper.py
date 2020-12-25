@@ -14,7 +14,7 @@ def set_seed(seed: int = 0):
     torch.cuda.manual_seed(seed)
 
 
-def get_grad(model, x, y, criterion):
+def get_input_grad(model, x, y, criterion):
     x = x.to('cuda')
     x.requires_grad = True
     y = y.to('cuda')
