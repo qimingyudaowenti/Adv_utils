@@ -14,6 +14,8 @@ class ConfigTrain:
     weight_decay: float = 5e-5
     momentum: float = 0.9
 
+    num_workers: int = 6
+
     dataset_name: str = ''
     dataset_norm: tuple = None
     model_name: str = None

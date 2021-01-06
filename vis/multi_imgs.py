@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import torch
 
 
 def show_images(images, num_per_col: int = 1, titles: list = None):
@@ -13,6 +14,12 @@ def show_images(images, num_per_col: int = 1, titles: list = None):
     :return: None
     """
     assert ((titles is None) or (len(images) == len(titles)))
+
+    if isinstance(images, torch.Tensor):
+        # NCHW
+        images = images.cpu().permute(0, 2, 3, 1)
+        images = images.numpy()
+
     n_images = len(images)
     if titles is None:
         titles = [str(i) for i in range(1, n_images + 1)]

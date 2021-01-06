@@ -1,9 +1,12 @@
-from torchvision import datasets
-import torch
+from typing import Tuple
+
 import numpy as np
+import torch
+from torchvision import datasets
 
 
-def get_random_mnist_samples(dataset_path: str, num: int, train: bool = False):
+def get_random_mnist_samples(dataset_path: str, num: int,
+                             train: bool = False) -> Tuple[torch.Tensor, torch.Tensor, list]:
     dataset = datasets.MNIST(root=dataset_path,
                              train=train, download=False)
     idx = np.random.choice(len(dataset), num, replace=False)
@@ -14,7 +17,8 @@ def get_random_mnist_samples(dataset_path: str, num: int, train: bool = False):
     return images, labels, cls
 
 
-def get_random_cifar10_samples(dataset_path: str, num: int, train: bool = False):
+def get_random_cifar10_samples(dataset_path: str, num: int,
+                               train: bool = False) -> Tuple[torch.Tensor, torch.Tensor, list]:
     dataset = datasets.CIFAR10(root=dataset_path,
                                train=train, download=False)
     idx = np.random.choice(len(dataset), num, replace=False)

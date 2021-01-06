@@ -57,8 +57,12 @@ def save_weights(save_dir: str, model: Module,
                    f'{cfg_train.max_lr}_{cfg_train.min_lr}_' + pth_name
 
     pth_name = add_time_prefix(pth_name)
-    if cfg_train.model_name is not None:
-        pth_name = cfg_train.model_name + '_' + pth_name
+
+    try:
+        if cfg_train.model_name is not None:
+            pth_name = cfg_train.model_name + '_' + pth_name
+    except AttributeError:
+        pass
 
     save_dir = Path(save_dir)
     save_dir.mkdir(parents=False, exist_ok=True)
@@ -98,6 +102,12 @@ def get_lr_scheduler(schedule_type: str, lr_max: float, epochs: int,
     elif schedule_type == 'cosine':
         def lr_schedule(t):
             return lr_max * 0.5 * (1 + np.cos(t / epochs * np.pi))
+    elif schedule_type == 'decay_epochs':
+        """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
+        def lr_schedule(t):
+            epochs_to_decay = 30
+            decay_a = 0.1
+            return lr_max * (decay_a ** (t // epochs_to_decay))
     else:
         raise ValueError(f"Unknown learning rate schedule: {schedule_type}")
 

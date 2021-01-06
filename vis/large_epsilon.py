@@ -103,7 +103,7 @@ if __name__ == '__main__':
                     'horse': 7, 'ship': 8, 'truck': 9}
         images, labels, cls = get_random_cifar10_samples(dataset_dir, 5)
         model = PreActResNet18()
-        w_path = 'weights/cifar10/mix_train/2020-12-22-20-26-31_200_128_0.1_0.001_.pth'
+        w_path = 'weights/cifar10/mix_train/2021-01-05-17-33-03_200_256_0.1_0.001_.pth'
         model.load_state_dict(torch.load(w_path))
 
         model.to('cuda')

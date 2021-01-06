@@ -2,6 +2,7 @@ import sys
 
 import torch.nn as nn
 import torch.optim as optim
+from torch.cuda.amp import autocast, GradScaler
 from torch.nn import Module
 from torch.utils.data import DataLoader
 from torchvision import datasets
@@ -9,17 +10,25 @@ from torchvision import transforms
 from tqdm import tqdm
 
 from utils.config import dir_dataset, ConfigTrain
-from utils.eval import test_accuracy
-from utils.net_helper import get_device, save_weights
-from utils.net_helper import get_lr_scheduler
+from utils.data_processing import InputNormalize
+from utils.data_processing.data_prefetcher import DataPrefetcher
+from utils.eval import test_accuracy, test_accuracy_pre
+from utils.net_helper import get_device, save_weights, get_lr_scheduler
 
 
 def train_custom(model: Module,
                  cfg_train: ConfigTrain, train_loader: DataLoader,
-                 val_loader: DataLoader = None, val_freq: int = None,
-                 dir_w: str = None):
+                 val_loader: DataLoader = None, val_freq: int = 1,
+                 dir_w: str = 'weights', use_amp: bool = False):
     device = get_device()
     model.to(device)
+    model.train()
+    normalizer = InputNormalize(*cfg_train.dataset_norm).to(device)
+
+    if use_amp:
+        scaler = GradScaler()
+    else:
+        scaler = None
 
     bs_print = cfg_train.bs_info
 
@@ -29,7 +38,7 @@ def train_custom(model: Module,
                           lr=cfg_train.max_lr,
                           weight_decay=cfg_train.weight_decay,
                           momentum=cfg_train.momentum)
-    lr_scheduler = get_lr_scheduler('cosine',
+    lr_scheduler = get_lr_scheduler(cfg_train.lr_schedule,
                                     cfg_train.max_lr,
                                     cfg_train.epoch)
 
@@ -42,15 +51,22 @@ def train_custom(model: Module,
             lr = lr_scheduler(i_epoch + (i_batch + 1) / len(train_loader))
             optimizer.param_groups[0].update(lr=lr)
 
-            inputs = batch[0].to(device)
+            inputs = normalizer(batch[0].to(device))
             labels = batch[1].to(device)
 
-            outputs = model(inputs)
-            loss = criterion(outputs, labels)
+            with autocast(enabled=use_amp):
+                outputs = model(inputs)
+                loss = criterion(outputs, labels)
 
             optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
+
+            if use_amp:
+                scaler.scale(loss).backward()
+                scaler.step(optimizer)
+                scaler.update()
+            else:
+                loss.backward()
+                optimizer.step()
 
             loss_print += loss.item()
 
@@ -61,8 +77,8 @@ def train_custom(model: Module,
                 loss_print = 0
 
             tqdm_bar.update(1)
-            tqdm_bar.set_description(f'epoch-{i_epoch + 1:<3}|'
-                                     f'batch-{i_batch + 1:<3}|'
+            tqdm_bar.set_description(f'epoch-{i_epoch + 1}|'
+                                     f'batch-{i_batch + 1}|'
                                      f'b-loss:{loss.item():<.4f}|'
                                      f'lr: {lr:.5f}')
 
@@ -71,6 +87,80 @@ def train_custom(model: Module,
             if i_epoch % val_freq == val_freq - 1:
                 model.eval()
                 test_accuracy(model, val_loader, cfg_train.dataset_norm)
+                model.train()
+
+    tqdm_bar.close()
+
+    if dir_w is not None:
+        save_weights(dir_w, model, cfg_train)
+
+
+def train_custom_amp_prefetech(model: Module,
+                               cfg_train: ConfigTrain, train_loader: DataLoader,
+                               val_loader: DataLoader = None, val_freq: int = 1,
+                               dir_w: str = 'weights'):
+    device = get_device()
+    model.to(device)
+
+    bs_print = cfg_train.bs_info
+
+    # ------ loss and optimizer ------
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.SGD(model.parameters(),
+                          lr=cfg_train.max_lr,
+                          weight_decay=cfg_train.weight_decay,
+                          momentum=cfg_train.momentum)
+    lr_scheduler = get_lr_scheduler(cfg_train.lr_schedule,
+                                    cfg_train.max_lr,
+                                    cfg_train.epoch)
+
+    scaler = GradScaler()
+    use_amp = True
+
+    tqdm_bar = tqdm(total=len(train_loader) * cfg_train.epoch,
+                    ncols=100, file=sys.stdout)
+
+    for i_epoch in range(cfg_train.epoch):
+        prefetcher = DataPrefetcher(train_loader, *cfg_train.dataset_norm)
+        inputs, labels = prefetcher.next()
+
+        loss_print = 0
+        i_batch = -1
+        while inputs is not None:
+            i_batch += 1
+            lr = lr_scheduler(i_epoch + (i_batch + 1) / len(train_loader))
+            optimizer.param_groups[0].update(lr=lr)
+
+            with autocast(enabled=use_amp):
+                outputs = model(inputs)
+                loss = criterion(outputs, labels)
+
+            optimizer.zero_grad()
+            scaler.scale(loss).backward()
+            scaler.step(optimizer)
+            scaler.update()
+
+            loss_print += loss.item()
+
+            if i_batch % bs_print == bs_print - 1:
+                tqdm_bar.write(f'[{i_epoch + 1:2}, {i_batch + 1:5}] '
+                               f'loss: {loss_print / bs_print:<10.4}'
+                               f'lr: {lr:.5f}')
+                loss_print = 0
+
+            tqdm_bar.update(1)
+            tqdm_bar.set_description(f'epoch-{i_epoch + 1}|'
+                                     f'batch-{i_batch + 1}|'
+                                     f'b-loss:{loss.item():<.4f}|'
+                                     f'lr: {lr:.5f}')
+
+            inputs, labels = prefetcher.next()
+
+        if val_loader is not None:
+            # do valuation
+            if i_epoch % val_freq == val_freq - 1:
+                model.eval()
+                test_accuracy_pre(model, val_loader, cfg_train.dataset_norm)
                 model.train()
 
     tqdm_bar.close()

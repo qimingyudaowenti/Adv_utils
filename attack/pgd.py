@@ -7,7 +7,7 @@ from utils.attack.step import WeakLinfStep
 
 
 class AttackerPGD(torch.nn.Module):
-    def __init__(self, model, config: ConfigAttack, data_norm: tuple):
+    def __init__(self, model, config: ConfigAttack):
         super(AttackerPGD, self).__init__()
         self.model = model
         self.attack_config = config
@@ -15,7 +15,7 @@ class AttackerPGD(torch.nn.Module):
 
         self.criterion = torch.nn.CrossEntropyLoss(reduction='none')
 
-        self.normalizer = InputNormalize(*data_norm)
+        self.normalizer = InputNormalize(*config.data_norm)
 
         self.random_start = config.random_start
         self.targeted = config.targeted

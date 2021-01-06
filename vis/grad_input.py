@@ -92,7 +92,7 @@ if __name__ == '__main__':
     def cifar10():
         images, labels, cls = get_random_cifar10_samples(dataset_dir, 5)
         model = PreActResNet18()
-        model.load_state_dict(torch.load('weights/cifar10/mix_train/2020-12-22-20-26-31_200_128_0.1_0.001_.pth'))
+        model.load_state_dict(torch.load('weights/cifar10/mix_train/weights/cifar10/mix_train/2021-01-05-17-33-03_200_256_0.1_0.001_.pth'))
         model.to('cuda')
         model.eval()
 
