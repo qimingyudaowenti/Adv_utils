@@ -22,4 +22,4 @@ dir_weight = 'weights/mnist'
 train_custom(model, cfg_train, loader_train, dir_w=dir_weight)
 
 loader_eval= get_loader('MNIST', train=False, batch_size=256, normed=False)
-test_accuracy(model, loader_eval, norm_mnist)
+test_accuracy(model, loader_eval, norm_none)
