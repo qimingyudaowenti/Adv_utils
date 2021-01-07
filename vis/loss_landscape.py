@@ -108,7 +108,7 @@ def plot_adv_loss_lanscape(model, img, delta, label, label_adv, norm, bound, cla
 
 
 if __name__ == '__main__':
-    from utils.config import cfg_attack_cifar10, norm_mnist, norm_cifar10, dir_dataset
+    from utils.config import cfg_attack_cifar10, norm_none, norm_cifar10, dir_dataset
     from utils.attack import *
     from utils.data_processing import get_random_mnist_samples, get_random_cifar10_samples
     from models import MnistCls, PreActResNet18
@@ -128,7 +128,7 @@ if __name__ == '__main__':
     elif DATASET == 'MNIST':
         path_weights = 'weights/mnist/mix_train/2020-12-22-18-53-15_10_128_0.01_0.001_.pth'
         model = MnistCls()
-        norm = norm_mnist
+        norm = norm_none
         cfg_attack = cfg_attack_mnist
         get_random_samples = get_random_mnist_samples
         bound = 0.3

@@ -14,8 +14,8 @@ def get_loader(ds_name: str, train: bool, batch_size: int, normed: bool = False)
         if normed:
             aug_mnist = transforms.Compose([
                 aug_mnist,
-                transforms.Normalize(norm_mnist[0],
-                                     norm_mnist[1])
+                transforms.Normalize(norm_none[0],
+                                     norm_none[1])
             ])
 
         ds = datasets.MNIST(root=dir_dataset,
