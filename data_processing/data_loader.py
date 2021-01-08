@@ -1,6 +1,5 @@
 from torch.utils.data import DataLoader
-from torchvision import datasets
-from torchvision import transforms
+from torchvision import datasets, transforms
 
 from utils.config import *
 
@@ -44,6 +43,6 @@ def get_loader(ds_name: str, train: bool, batch_size: int, normed: bool = False)
         raise ValueError('Dataset should be CIFAR10 or MNIST.')
 
     loader = DataLoader(ds, batch_size=batch_size,
-                        shuffle=True, num_workers=4, pin_memory=True)
+                        shuffle=True, num_workers=8, pin_memory=True)
 
     return loader

@@ -1,7 +1,7 @@
 from models.mnist import MnistCls
 from utils.config import *
 from utils.data_processing import get_loader
-from utils.train import train_custom
+from utils.train import train
 from utils.eval import test_accuracy
 
 dataset_name = 'MNIST'
@@ -19,7 +19,7 @@ cfg_train = ConfigTrain(
 loader_train = get_loader('MNIST', train=True, batch_size=128, normed=True)
 
 dir_weight = 'weights/mnist'
-train_custom(model, cfg_train, loader_train, dir_w=dir_weight)
+train(model, cfg_train, loader_train, dir_w=dir_weight)
 
 loader_eval= get_loader('MNIST', train=False, batch_size=256, normed=False)
 test_accuracy(model, loader_eval, norm_none)

@@ -15,7 +15,7 @@ class AttackerPGD(torch.nn.Module):
 
         self.criterion = torch.nn.CrossEntropyLoss(reduction='none')
 
-        self.normalizer = InputNormalize(*config.data_norm)
+        self.normalizer = InputNormalize(*config.norm)
 
         self.random_start = config.random_start
         self.targeted = config.targeted

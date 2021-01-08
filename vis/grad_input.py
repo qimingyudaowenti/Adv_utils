@@ -74,7 +74,7 @@ if __name__ == '__main__':
     def mnist():
         images, labels, cls = get_random_mnist_samples(dataset_dir, 5)
         model = MnistCls()
-        model.load_state_dict(torch.load('weights/mnist/mix_train/2020-12-22-18-53-15_10_128_0.01_0.001_.pth'))
+        model.load_state_dict(torch.load('weights/mnist/mix_train/no_norm.pth'))
         model.to('cuda')
         model.eval()
 
@@ -92,7 +92,7 @@ if __name__ == '__main__':
     def cifar10():
         images, labels, cls = get_random_cifar10_samples(dataset_dir, 5)
         model = PreActResNet18()
-        model.load_state_dict(torch.load('weights/cifar10/mix_train/weights/cifar10/mix_train/2021-01-05-17-33-03_200_256_0.1_0.001_.pth'))
+        model.load_state_dict(torch.load('weights/cifar10/mix_train/2021-01-07-21-32-55_200_256_0.1_0.001_.pth'))
         model.to('cuda')
         model.eval()
 

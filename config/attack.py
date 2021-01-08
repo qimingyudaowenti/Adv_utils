@@ -8,7 +8,7 @@ class ConfigAttack:
     steps: int
     step_size: float
 
-    data_norm: tuple = None
+    norm: tuple = None
 
     random_start: bool = False
     targeted: bool = False

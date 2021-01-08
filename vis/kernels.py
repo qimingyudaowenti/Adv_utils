@@ -32,13 +32,13 @@ if __name__ == '__main__':
 
     if ds_name == 'MNIST':
         model = MnistCls()
-        path_mix_w = 'weights/mnist/mix_train/2020-12-22-18-53-15_10_128_0.01_0.001_.pth'
-        path_nat_w = 'weights/mnist/2020-12-22-18-57-59_10_64_0.01_0.001_.pth'
+        path_mix_w = 'weights/mnist/mix_train/no_norm.pth'
+        path_nat_w = 'weights/mnist/no_norm.pth'
         path_adv_w = 'weights/mnist/2020-08-19-10-45-58_20_64_0.01_0.001_adv.pth'
         w_path = path_adv_w
     elif ds_name == 'CIFAR10':
         model = PreActResNet18()
-        path_mix_w = 'weights/cifar10/mix_train/weights/cifar10/mix_train/2021-01-05-17-33-03_200_256_0.1_0.001_.pth'
+        path_mix_w = 'weights/cifar10/mix_train/2021-01-07-21-32-55_200_256_0.1_0.001_.pth'
         path_nat_w = 'weights/cifar10/PreActResNet18_2020-12-01-16-15-49_150_128_0.1_0.001_nat.pth'
         path_adv_w = 'weights/cifar10/PreActResNet18_2020-12-02-20-30-28_200_128_0.1_0.001_adv.pth'
         w_path = path_adv_w

@@ -16,19 +16,25 @@ from utils.eval import test_accuracy, test_accuracy_pre
 from utils.net_helper import get_device, save_weights, get_lr_scheduler
 
 
-def train_custom(model: Module,
-                 cfg_train: ConfigTrain, train_loader: DataLoader,
-                 val_loader: DataLoader = None, val_freq: int = 1,
-                 dir_w: str = 'weights', use_amp: bool = False):
+def train(model: Module,
+          cfg_train: ConfigTrain, train_loader: DataLoader,
+          val_loader: DataLoader = None, val_freq: int = 1,
+          dir_w: str = 'weights', use_amp: bool = False,
+          val_acc_record: bool = False):
     device = get_device()
     model.to(device)
     model.train()
-    normalizer = InputNormalize(*cfg_train.dataset_norm).to(device)
+    normalizer = InputNormalize(*cfg_train.norm).to(device)
 
     if use_amp:
         scaler = GradScaler()
     else:
         scaler = None
+
+    if val_acc_record:
+        record = []
+    else:
+        record = None
 
     bs_print = cfg_train.bs_info
 
@@ -86,13 +92,17 @@ def train_custom(model: Module,
             # do valuation
             if i_epoch % val_freq == val_freq - 1:
                 model.eval()
-                test_accuracy(model, val_loader, cfg_train.dataset_norm)
+                _, acc = test_accuracy(model, val_loader, cfg_train.norm)
+                if val_acc_record:
+                    record.append(acc)
                 model.train()
 
     tqdm_bar.close()
 
     if dir_w is not None:
         save_weights(dir_w, model, cfg_train)
+
+    return record
 
 
 def train_custom_amp_prefetech(model: Module,
@@ -121,7 +131,7 @@ def train_custom_amp_prefetech(model: Module,
                     ncols=100, file=sys.stdout)
 
     for i_epoch in range(cfg_train.epoch):
-        prefetcher = DataPrefetcher(train_loader, *cfg_train.dataset_norm)
+        prefetcher = DataPrefetcher(train_loader, *cfg_train.norm)
         inputs, labels = prefetcher.next()
 
         loss_print = 0
@@ -160,7 +170,7 @@ def train_custom_amp_prefetech(model: Module,
             # do valuation
             if i_epoch % val_freq == val_freq - 1:
                 model.eval()
-                test_accuracy_pre(model, val_loader, cfg_train.dataset_norm)
+                test_accuracy_pre(model, val_loader, cfg_train.norm)
                 model.train()
 
     tqdm_bar.close()
@@ -203,7 +213,7 @@ def do_cifar10_train():
     train_loader = DataLoader(
         train_set, batch_size=cfg_loader_train.batch_size, shuffle=True, num_workers=4)
 
-    train_custom(model, cfg_loader_train, train_loader, 'weights/CIFAR10/ResNet18/natural')
+    train(model, cfg_loader_train, train_loader, 'weights/CIFAR10/ResNet18/natural')
 
     cfg_loader_test = ConfigTrain(
         train=False,
@@ -241,7 +251,7 @@ def do_mnist_train():
     train_loader = DataLoader(
         train_set, batch_size=cfg_loader_train.batch_size, shuffle=True, num_workers=4)
 
-    train_custom(model, cfg_loader_train, train_loader, 'weights/MNIST/natural')
+    train(model, cfg_loader_train, train_loader, 'weights/MNIST/natural')
 
     cfg_loader_test = LoaderConfig(
         train=False,

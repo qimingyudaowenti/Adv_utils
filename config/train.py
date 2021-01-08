@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+
 import torch
 
 
@@ -16,8 +17,8 @@ class ConfigTrain:
 
     num_workers: int = 6
 
-    dataset_name: str = ''
-    dataset_norm: tuple = None
+    name_dataset: str = ''
+    norm: tuple = None
     model_name: str = None
     bs_info: int = 100  # print info every x batches
 
@@ -29,9 +30,9 @@ cfg_train_mnist = ConfigTrain(
     min_lr=0.001,
     weight_decay=1e-5,
     momentum=0.9,
-    dataset_name='MNIST',
-    dataset_norm=(torch.tensor([0.0]),
-                  torch.tensor([1.0]))
+    name_dataset='MNIST',
+    norm=(torch.tensor([0.0]),
+          torch.tensor([1.0]))
 )
 
 cfg_train_cifar10 = ConfigTrain(
@@ -41,7 +42,7 @@ cfg_train_cifar10 = ConfigTrain(
     min_lr=0.001,
     weight_decay=1e-4,
     momentum=0.9,
-    dataset_name='CIFAR10',
-    dataset_norm=(torch.tensor([0.4914, 0.4822, 0.4465]),
-                  torch.tensor([0.2470, 0.2435, 0.2616]))
+    name_dataset='CIFAR10',
+    norm=(torch.tensor([0.4914, 0.4822, 0.4465]),
+          torch.tensor([0.2470, 0.2435, 0.2616]))
 )

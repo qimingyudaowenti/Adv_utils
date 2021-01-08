@@ -126,7 +126,7 @@ if __name__ == '__main__':
         bound = 8 / 255
         classes = classes_cifar10
     elif DATASET == 'MNIST':
-        path_weights = 'weights/mnist/mix_train/2020-12-22-18-53-15_10_128_0.01_0.001_.pth'
+        path_weights = 'weights/mnist/mix_train/no_norm.pth'
         model = MnistCls()
         norm = norm_none
         cfg_attack = cfg_attack_mnist
