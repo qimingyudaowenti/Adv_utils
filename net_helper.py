@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 import torch
 from torch.nn import Module
-
+import warnings
 from utils.config import *
 
 
@@ -32,8 +32,7 @@ def get_device():
         torch.backends.cudnn.benchmark = True
     else:
         device = torch.device('cpu')
-
-    print(f'Find device: {device}.')
+        warnings.warn("You are using CPU!")
 
     return device
 

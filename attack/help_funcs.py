@@ -37,7 +37,8 @@ def test_adv_transfer(source_model, source_norm, target_model, target_norm,
     s_normalizer = InputNormalize(*source_norm).to(device)
     t_normalizer = InputNormalize(*target_norm).to(device)
 
-    correct = 0
+    correct_t = 0
+    correct_s = 0
     total = 0
 
     tqdm_bar = tqdm(total=len(data_loader), ncols=100, file=sys.stdout)
@@ -45,17 +46,21 @@ def test_adv_transfer(source_model, source_norm, target_model, target_norm,
         inputs = s_normalizer(batch[0].to(device))
         labels = batch[1].to(device)
 
-        im_adv, _ = attacker(inputs, labels)
+        im_adv, im_adv_normed = attacker(inputs, labels)
 
         with torch.no_grad():
-            outputs = target_model(t_normalizer(im_adv))
+            outputs_s = source_model(im_adv_normed)
+            outputs_t = target_model(t_normalizer(im_adv))
 
-        _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
-        correct += (predicted == labels).sum().item()
+        _, predicted_s = torch.max(outputs_s.data, 1)
+        correct_s += (predicted_s == labels).sum().item()
+        _, predicted_t = torch.max(outputs_t.data, 1)
+        correct_t += (predicted_t == labels).sum().item()
 
         tqdm_bar.update(1)
-        tqdm_bar.set_description_str(f'Test on {total} examples. '
-                                     f'Adv transfer acc-{correct / total:.2%}')
+        tqdm_bar.set_description_str(f'Test on {total} examples | '
+                                     f'Adv acc-{correct_s / total:.2%} | '
+                                     f'Adv transfer acc-{correct_t / total:.2%}')
 
     tqdm_bar.close()

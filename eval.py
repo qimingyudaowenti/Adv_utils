@@ -83,7 +83,7 @@ def test_accuracy_pre(model, loader_eval, norm):
     return total, correct / total
 
 
-def test_robustness(model, loader_eval, norm,
+def test_robustness(model, loader,
                     attack_config: ConfigAttack, proportion: float = 1.0):
     device = get_device()
 
@@ -92,13 +92,13 @@ def test_robustness(model, loader_eval, norm,
 
     correct = 0
     total = 0
-    total_batches = len(loader_eval)
+    total_batches = len(loader)
     stop_batch_num = int(total_batches * proportion)
 
-    attacker = AttackerPGD(model, attack_config, norm)
+    attacker = AttackerPGD(model, attack_config)
     attacker.to(device)
 
-    iterator_tqdm = tqdm(loader_eval, file=sys.stdout, position=0)
+    iterator_tqdm = tqdm(loader, file=sys.stdout, position=0)
 
     for i, train_batched in enumerate(iterator_tqdm):
 
@@ -212,8 +212,9 @@ if __name__ == '__main__':
                              shuffle=False, num_workers=4)
 
     model = PreActResNet18()
+    model.load_state_dict(torch.load('weights/cifar10/nat/2021-01-09-10-06-40_200_256_0.1_0.001_.pth'))
     model.to('cuda:0')
 
-    print(test_accuracy(model, loader_test, norm_cifar10, proportion=0.5))
+    print(test_accuracy(model, loader_test, norm_cifar10))
 
-    print(test_robustness(model, loader_test, norm_cifar10, cfg_attack_cifar10, proportion=0.5))
+    print(test_robustness(model, loader_test, cfg_attack_cifar10))
