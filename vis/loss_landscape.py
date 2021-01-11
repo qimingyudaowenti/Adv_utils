@@ -110,15 +110,15 @@ def plot_adv_loss_lanscape(model, img, delta, label, label_adv, norm, bound, cla
 if __name__ == '__main__':
     from utils.config import cfg_attack_cifar10, norm_none, norm_cifar10, dir_dataset
     from utils.attack import *
-    from utils.data_processing import get_random_mnist_samples, get_random_cifar10_samples
+    from utils.data_processing import get_random_mnist_samples, get_random_cifar10_samples, InputNormalize
     from models import MnistCls, PreActResNet18
     from utils.net_helper import *
     from utils.config import classes_mnist
 
-    DATASET = 'MNIST'
+    DATASET = 'CIFAR10'
 
     if DATASET == 'CIFAR10':
-        path_weights = 'weights/cifar10/PreActResNet18_2020-12-02-20-30-28_200_128_0.1_0.001_adv.pth'
+        path_weights = 'weights/cifar10/adv/2021-01-10-13-31-20_200_256_0.1_0.001_mix.pth'
         model = PreActResNet18()
         norm = norm_cifar10
         cfg_attack = cfg_attack_cifar10
@@ -126,7 +126,7 @@ if __name__ == '__main__':
         bound = 8 / 255
         classes = classes_cifar10
     elif DATASET == 'MNIST':
-        path_weights = 'weights/mnist/mix_train/no_norm.pth'
+        path_weights = 'weights/mnist/mix_train/norm.pth'
         model = MnistCls()
         norm = norm_none
         cfg_attack = cfg_attack_mnist
@@ -143,7 +143,7 @@ if __name__ == '__main__':
     samples_num = 5
 
     # ------ attack ------
-    attacker = AttackerPGD(model, cfg_attack, norm)
+    attacker = AttackerPGD(model, cfg_attack)
     attacker.to(device)
     normalizer = InputNormalize(*norm).to(device)
 

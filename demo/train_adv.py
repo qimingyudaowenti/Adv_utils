@@ -121,7 +121,7 @@ def cifar10():
         val_freq=10,
         dir_w=dir_weight,
         record=True)
-    np.save(dir_weight + '/' + 'val_acc_rob.npy', np.array(val_acc_rob))
+    np.save(dir_weight + '/' + 'pos_val_on_pure.npy', np.array(val_acc_rob))
 
 
 if __name__ == '__main__':
