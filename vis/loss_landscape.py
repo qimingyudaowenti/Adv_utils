@@ -118,7 +118,7 @@ if __name__ == '__main__':
     DATASET = 'CIFAR10'
 
     if DATASET == 'CIFAR10':
-        path_weights = 'weights/cifar10/adv/2021-01-10-13-31-20_200_256_0.1_0.001_mix.pth'
+        path_weights = 'weights/cifar10/mix_train/2021-01-08-23-25-26_200_256_0.1_0.001_.pth'
         model = PreActResNet18()
         norm = norm_cifar10
         cfg_attack = cfg_attack_cifar10
@@ -126,7 +126,7 @@ if __name__ == '__main__':
         bound = 8 / 255
         classes = classes_cifar10
     elif DATASET == 'MNIST':
-        path_weights = 'weights/mnist/mix_train/norm.pth'
+        path_weights = 'weights/mnist/mix_train/norm_pos.pth'
         model = MnistCls()
         norm = norm_none
         cfg_attack = cfg_attack_mnist

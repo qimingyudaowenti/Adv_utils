@@ -63,21 +63,32 @@ if __name__ == '__main__':
     from torchvision import datasets
     from utils.config import dir_dataset
 
-    train_set_cifar10 = datasets.CIFAR10(root=dir_dataset,
+    ds_name = 'ImageNet'
+
+    if ds_name == 'CIFAR10':
+        train_set_cifar10 = datasets.CIFAR10(root=dir_dataset,
+                                             train=True, download=False)
+
+        print('========== CIFAR10 ==========')
+        print(calc_norm(train_set_cifar10))
+        print(train_set_cifar10.data.mean(axis=(0, 1, 2)) / 255,
+              train_set_cifar10.data.std(axis=(0, 1, 2)) / 255)
+        print('Neg-Mix:', calc_norm(train_set_cifar10, neg_mix=True))
+        # (array([0.5, 0.5, 0.5]), array([0.2471819 , 0.24413793, 0.26699652]))
+    elif ds_name == 'MNIST':
+        train_set_mnist = datasets.MNIST(root=dir_dataset,
                                          train=True, download=False)
+        print('========== MNIST ==========')
+        print(calc_norm(train_set_mnist))
+        print((train_set_mnist.data * 1.0).mean() / 255,
+              (train_set_mnist.data * 1.0).std() / 255)
+        print('Neg-Mix:', calc_norm(train_set_mnist, neg_mix=True))
+        # (0.5, 0.48098035571478076)
+    elif ds_name == 'ImageNet':
+        path = dir_dataset+'/ILSVRC2012'
+        train_set_imagenet = datasets.ImageNet(path, 'train')
+        print('========== ImageNet ==========')
+        print(calc_norm(train_set_imagenet))
+        print((train_set_imagenet.data * 1.0).mean() / 255,
+              (train_set_imagenet.data * 1.0).std() / 255)
 
-    print('========== CIFAR10 ==========')
-    print(calc_norm(train_set_cifar10))
-    print(train_set_cifar10.data.mean(axis=(0, 1, 2)) / 255,
-          train_set_cifar10.data.std(axis=(0, 1, 2)) / 255)
-    print('Neg-Mix:', calc_norm(train_set_cifar10, neg_mix=True))
-    # (array([0.5, 0.5, 0.5]), array([0.2471819 , 0.24413793, 0.26699652]))
-
-    train_set_mnist = datasets.MNIST(root=dir_dataset,
-                                     train=True, download=False)
-    print('========== MNIST ==========')
-    print(calc_norm(train_set_mnist))
-    print((train_set_mnist.data * 1.0).mean() / 255,
-          (train_set_mnist.data * 1.0).std() / 255)
-    print('Neg-Mix:', calc_norm(train_set_mnist, neg_mix=True))
-    # (0.5, 0.48098035571478076)

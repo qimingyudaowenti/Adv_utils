@@ -100,14 +100,14 @@ def test_robustness(model, loader,
 
     iterator_tqdm = tqdm(loader, file=sys.stdout, position=0)
 
-    for i, train_batched in enumerate(iterator_tqdm):
+    for i, test_batch in enumerate(iterator_tqdm):
 
         # skip some batches for saving time
         if i > stop_batch_num:
             break
 
-        imgs = train_batched[0].to(device)
-        labels = train_batched[1].to(device)
+        imgs = test_batch[0].to(device)
+        labels = test_batch[1].to(device)
 
         im_adv, im_adv_normed = attacker(imgs, labels)
 
@@ -151,13 +151,13 @@ def test_samples_accuracy(model, inputs: torch.Tensor, labels: torch.Tensor,
             imgs = inputs[s_idx:e_idx].to(device)
             if norm is not None:
                 imgs = normalizer(imgs)
-            labels = labels[s_idx:e_idx].to(device)
+            y = labels[s_idx:e_idx].to(device)
 
             outputs = model(imgs)
 
             _, predicted = torch.max(outputs.data, 1)
-            total += labels.size(0)
-            correct += (predicted == labels).sum().item()
+            total += y.size(0)
+            correct += (predicted == y).sum().item()
 
     return total, correct / total
 

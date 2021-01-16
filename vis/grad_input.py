@@ -92,7 +92,7 @@ if __name__ == '__main__':
     def cifar10():
         images, labels, cls = get_random_cifar10_samples(dataset_dir, 5)
         model = PreActResNet18()
-        model.load_state_dict(torch.load('weights/cifar10/mix_train/2021-01-07-21-32-55_200_256_0.1_0.001_.pth'))
+        model.load_state_dict(torch.load('weights/cifar10/adv/2021-01-10-13-31-20_200_256_0.1_0.001_mix.pth'))
         model.to('cuda')
         model.eval()
 
@@ -103,7 +103,7 @@ if __name__ == '__main__':
         grads = get_input_grad(model, x, labels, criterion)
 
         vis_grad = vis_imgs_grad(grads, channel_num=3)
-        show_images(images.permute(0, 2, 3, 1), num_per_col=1, titles=cls)
+        show_images(images, num_per_col=1, titles=cls)
         show_images(vis_grad, num_per_col=1, titles=cls)
 
     cifar10()

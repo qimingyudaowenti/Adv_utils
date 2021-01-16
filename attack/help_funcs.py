@@ -24,7 +24,7 @@ def get_adv_examples(model,
 
 
 # the 'norm' in cfg_attack should be 'source_norm'
-def test_adv_transfer(source_model, source_norm, target_model, target_norm,
+def test_adv_transfer(source_model, target_model, target_norm,
                       data_loader, cfg_attack: ConfigAttack):
     device = get_device()
 
@@ -34,7 +34,6 @@ def test_adv_transfer(source_model, source_norm, target_model, target_norm,
     source_model.eval()
 
     attacker = AttackerPGD(source_model, cfg_attack).to(device)
-    s_normalizer = InputNormalize(*source_norm).to(device)
     t_normalizer = InputNormalize(*target_norm).to(device)
 
     correct_t = 0
@@ -43,7 +42,7 @@ def test_adv_transfer(source_model, source_norm, target_model, target_norm,
 
     tqdm_bar = tqdm(total=len(data_loader), ncols=100, file=sys.stdout)
     for i_batch, batch in enumerate(data_loader):
-        inputs = s_normalizer(batch[0].to(device))
+        inputs = batch[0].to(device)
         labels = batch[1].to(device)
 
         im_adv, im_adv_normed = attacker(inputs, labels)

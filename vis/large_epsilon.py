@@ -16,6 +16,7 @@ def l2_clipper(o, x, eps):
 
 
 def make_adv_l2(model, x, y, criterion):
+    # normalize?
     advs = torch.clone(x).detach()
     advs.requires_grad = True
 
@@ -64,8 +65,9 @@ if __name__ == '__main__':
 
     from models import MnistCls, PreActResNet18
     from utils.vis import make_adv_l2, show_images
-    from utils.data_processing import get_random_mnist_samples, get_random_cifar10_samples
+    from utils.data_processing import get_random_mnist_samples, get_random_cifar10_samples, InputNormalize
     from utils.net_helper import set_seed
+    from utils.config import *
 
     set_seed(0)
 
@@ -74,15 +76,18 @@ if __name__ == '__main__':
 
     def mnist():
         images, labels, cls = get_random_mnist_samples(dataset_dir, 5)
+        norm = norm_mnist_mix
+
         model = MnistCls()
-        model.load_state_dict(torch.load('weights/mnist/mix_train/no_norm.pth'))
+        model.load_state_dict(torch.load('weights/mnist/mix_train/norm.pth'))
         model.to('cuda')
         model.eval()
+        normalizer = InputNormalize(*norm).to('cuda')
 
         criterion = nn.CrossEntropyLoss()
 
-        x = images.unsqueeze(1).to(dtype=torch.float)
-        x = x.to('cuda')
+        x = images.unsqueeze(1).to(device='cuda', dtype=torch.float)
+        x = normalizer(x)
         x.requires_grad = True
         y = labels.to('cuda')
 
@@ -92,6 +97,7 @@ if __name__ == '__main__':
         adv_cls = [str(i) for i in preds.cpu().tolist()]
 
         adv_images = advs.detach().cpu().squeeze(1).numpy()
+        print(images.size(), len(cls))
         show_images(images, num_per_col=1, titles=cls)
         show_images(adv_images, num_per_col=1, titles=adv_cls)
         plt.show()
@@ -105,6 +111,8 @@ if __name__ == '__main__':
         model = PreActResNet18()
         w_path = 'weights/cifar10/mix_train/2021-01-07-21-32-55_200_256_0.1_0.001_.pth'
         model.load_state_dict(torch.load(w_path))
+        norm = norm_cifar10_mix
+        normalizer = InputNormalize(*norm).to('cuda')
 
         model.to('cuda')
         model.eval()
@@ -112,10 +120,12 @@ if __name__ == '__main__':
         criterion = nn.CrossEntropyLoss()
 
         x = images.to(dtype=torch.float, device='cuda')
+        x = normalizer(x)
         x.requires_grad = True
         y = labels.to('cuda')
 
         advs = make_adv_l2(model, x, y, criterion)
+
         preds = model(advs).max(1)[1]
 
         adv_cls = [i for i in preds.cpu().tolist()]
@@ -124,6 +134,7 @@ if __name__ == '__main__':
 
         images = images.cpu().permute(0, 2, 3, 1).numpy()
         adv_images = advs.detach().cpu().permute(0, 2, 3, 1).numpy()
+
         show_images(images, num_per_col=1, titles=cls)
         show_images(adv_images, num_per_col=1, titles=adv_cls)
         plt.show()

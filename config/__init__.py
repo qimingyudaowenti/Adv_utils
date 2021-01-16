@@ -18,4 +18,5 @@ __all__ = [
     'classes_cifar10',
     'norm_mnist_mix',
     'norm_mnist',
+    'norm_imagenet',
 ]
