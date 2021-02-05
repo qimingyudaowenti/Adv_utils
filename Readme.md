@@ -53,9 +53,19 @@ The structure in the data directory should be like this:
 
 ### Run the demo
 
+#### Train / Validation / Test
 
+- Natural: `demo/train.py`
+- Adversarial: `demo/train_adv.py`
 
+#### Visualize
 
+- Show some samples and do processing:  `demo/vis_negative_samples.py`
+
+  ![img](vis_neg.jpeg)
+
+- todo: Add more demos.
 ## Acknowledgments
 
+MadryLab - [robustness](https://github.com/MadryLab/robustness)
 
