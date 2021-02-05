@@ -3,17 +3,27 @@ import numpy as np
 import torch
 
 
-def show_images(images, num_per_col: int = 1, titles: list = None):
+def show_images(images, num_per_col: int = 1, titles: list = None, first_line_title: bool = False):
     """Display a list of images(0~1) in a single figure with matplotlib.
 
+    :param first_line_title:
     :param images: List of np.arrays compatible with plt.imshow.
     :param num_per_col: Number of columns in figure (number of rows is
                         set to np.ceil(n_images/float(cols))).
-    :param titles: List of titles corresponding to each image. Must have
-                   the same length as titles.
+    :param titles: List of titles corresponding to each image.
     :return: None
     """
-    assert ((titles is None) or (len(images) == len(titles)))
+
+    n_images = len(images)
+
+    if titles is None:
+        # titles = [str(i) for i in range(1, n_images + 1)]
+        titles = ['' for _ in range(n_images)]
+    elif len(titles) < n_images:
+        if first_line_title:
+            assert len(titles) == n_images // num_per_col
+
+        titles += ['' for _ in range(n_images - len(titles))]
 
     if isinstance(images, torch.Tensor):
         # NCHW
@@ -21,20 +31,22 @@ def show_images(images, num_per_col: int = 1, titles: list = None):
             images = images.cpu().permute(0, 2, 3, 1)
         images = images.numpy()
 
-    n_images = len(images)
-    if titles is None:
-        titles = [str(i) for i in range(1, n_images + 1)]
     fig = plt.figure()
     for n, (image, title) in enumerate(zip(images, titles)):
-        a = fig.add_subplot(num_per_col,
-                            int(np.ceil(n_images / float(num_per_col))),
-                            n + 1)
+        line_num = int(np.ceil(n_images / float(num_per_col)))
+        a = fig.add_subplot(num_per_col, line_num, n + 1)
         if image.ndim == 2 or image.shape[2] == 1:
             plt.gray()
         plt.axis('off')
         plt.imshow(image, vmin=0, vmax=1)
-        a.set_title(title)
 
+        if first_line_title:
+            if n < line_num:
+                a.set_title(title)
+        else:
+            a.set_title(title)
+
+    plt.tight_layout()
     plt.show()
 
 
