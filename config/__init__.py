@@ -4,6 +4,7 @@ from utils.config.train import ConfigTrain, cfg_train_cifar10, cfg_train_mnist
 
 __all__ = [
     'ConfigTrain',
+    'ConfigAttack',
     'cfg_train_cifar10',
     'cfg_train_mnist',
     'ConfigAttack',
@@ -11,7 +12,8 @@ __all__ = [
     'cfg_attack_mnist',
     'dir_dataset',
     'dir_weight',
-    'norm_none',
+    'norm_none_mnist',
+    'norm_none_cifar10',
     'norm_cifar10',
     'norm_cifar10_mix',
     'classes_mnist',

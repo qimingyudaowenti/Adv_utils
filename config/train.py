@@ -6,7 +6,7 @@ import torch
 @dataclass()
 class ConfigTrain:
     batch_size: int = 64
-    epoch: int = 1
+    epoch: int = 6
 
     lr_schedule: str = ''
     max_lr: float = 0.01
@@ -37,7 +37,7 @@ cfg_train_mnist = ConfigTrain(
 
 cfg_train_cifar10 = ConfigTrain(
     batch_size=128,
-    epoch=200,
+    epoch=10,
     max_lr=0.1,
     min_lr=0.001,
     weight_decay=1e-4,

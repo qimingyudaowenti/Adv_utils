@@ -27,7 +27,7 @@ def show_images(images, num_per_col: int = 1, titles: list = None, first_line_ti
 
     if isinstance(images, torch.Tensor):
         # NCHW
-        if images.ndim == 4 and images.size(1) == 3:
+        if images.ndim == 4 and images.size(1) in [1, 3]:
             images = images.cpu().permute(0, 2, 3, 1)
         images = images.numpy()
 

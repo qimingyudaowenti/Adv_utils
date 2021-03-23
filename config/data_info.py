@@ -4,8 +4,11 @@ dir_dataset = '/home/gy/torchvision_dataset'
 dir_weight = 'weights'
 
 # norm: (mean, std)
-norm_none = (torch.tensor([0.0]),
-             torch.tensor([1.0]))
+norm_none_mnist = (torch.tensor([0.0]),
+                   torch.tensor([1.0]))
+
+norm_none_cifar10 = (torch.tensor([0.0, 0.0, 0.0]),
+                     torch.tensor([1.0, 1.0, 1.0]))
 
 norm_mnist = (torch.tensor([0.1306604762738429]),
               torch.tensor([0.30810780385646264]))
