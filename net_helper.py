@@ -6,9 +6,11 @@ import torch
 from torch.nn import Module
 import warnings
 from utils.config import *
+import random
 
 
 def set_seed(seed: int = 0):
+    random.seed(0)
     torch.manual_seed(seed)
     np.random.seed(seed)
     torch.cuda.manual_seed_all(seed)
