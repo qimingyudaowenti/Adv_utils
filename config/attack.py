@@ -5,7 +5,7 @@ from utils.config.data_info import norm_mnist, norm_cifar10
 class ConfigAttack:
     constraint: str
     epsilon: float
-    steps: int
+    num_steps: int
     step_size: float
 
     norm: tuple = None
@@ -20,7 +20,7 @@ cfg_attack_mnist = \
     ConfigAttack(
         constraint='inf',
         epsilon=0.3,
-        steps=40,
+        num_steps=40,
         step_size=0.1,
         norm=norm_mnist,
         random_start=True)
@@ -29,7 +29,7 @@ cfg_attack_cifar10 = \
     ConfigAttack(
         constraint='inf',
         epsilon=8 / 255,
-        steps=10,
+        num_steps=10,
         step_size=0.007843,  # 2.5*eps/steps in robustness-lib
         norm=norm_cifar10,
         random_start=True)

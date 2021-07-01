@@ -32,6 +32,8 @@ def show_images(images, num_per_col: int = 1, titles: list = None, first_line_ti
         images = images.numpy()
 
     fig = plt.figure()
+    fig.set_figwidth(10)
+    fig.set_figheight(4)
     for n, (image, title) in enumerate(zip(images, titles)):
         line_num = int(np.ceil(n_images / float(num_per_col)))
         a = fig.add_subplot(num_per_col, line_num, n + 1)

@@ -1,12 +1,13 @@
 import datetime
+import random
+import warnings
 from pathlib import Path
 
 import numpy as np
 import torch
 from torch.nn import Module
-import warnings
+
 from utils.config import *
-import random
 
 
 def set_seed(seed: int = 0):
@@ -44,6 +45,20 @@ def add_time_prefix(s):
     now_time = datetime.datetime.now()
 
     return f'{now_time.strftime("%Y-%m-%d-%H-%M-%S")}_' + s
+
+
+def save_epoch_weights(save_dir: str, i_epoch: int, model: Module):
+    save_dir = Path(save_dir)
+    save_dir.mkdir(parents=False, exist_ok=True)
+    weights_path = save_dir / f'weights_{i_epoch}.pth'
+    torch.save(model.state_dict(), weights_path)
+
+
+def save_best_rob_weights(save_dir: str, model: Module):
+    save_dir = Path(save_dir)
+    save_dir.mkdir(parents=False, exist_ok=True)
+    weights_path = save_dir / f'best.pth'
+    torch.save(model.state_dict(), weights_path)
 
 
 def save_weights(save_dir: str, model: Module,
@@ -106,6 +121,7 @@ def get_lr_scheduler(schedule_type: str, lr_max: float, epochs: int,
             return lr_max * 0.5 * (1 + np.cos(t / epochs * np.pi))
     elif schedule_type == 'decay_epochs':
         """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
+
         def lr_schedule(t):
             epochs_to_decay = 30
             decay_a = 0.1

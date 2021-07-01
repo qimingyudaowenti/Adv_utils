@@ -61,8 +61,8 @@ if __name__ == '__main__':
     import torch
     import torch.nn as nn
 
-    from models.mnist import MnistCls
-    from models.cifar10 import PreActResNet18
+    # from models.mnist import MnistCls
+    from models.preact_resnet_cifar import PreActResNet18
     from utils.net_helper import get_input_grad
     from utils.vis.multi_imgs import show_images
     from utils.data_processing import get_random_mnist_samples,get_random_cifar10_samples
@@ -92,7 +92,7 @@ if __name__ == '__main__':
     def cifar10():
         images, labels, cls = get_random_cifar10_samples(dataset_dir, 5)
         model = PreActResNet18()
-        model.load_state_dict(torch.load('weights/cifar10/adv/2021-01-10-13-31-20_200_256_0.1_0.001_mix.pth'))
+        model.load_state_dict(torch.load('PGD10_results/normal_adv/weights/weights_52.pth'))
         model.to('cuda')
         model.eval()
 

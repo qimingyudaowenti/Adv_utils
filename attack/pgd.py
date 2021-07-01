@@ -60,7 +60,7 @@ class AttackerPGD(torch.nn.Module):
             return bloss, bx
 
         # PGD iterates
-        for _ in range(self.attack_config.steps):
+        for _ in range(self.attack_config.num_steps):
             x = x.clone().detach().requires_grad_(True)
             losses, out = self.calc_loss(x, label_y)
             assert losses.shape[0] == x.shape[0], \

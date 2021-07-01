@@ -34,7 +34,7 @@ class AttackerStep:
            point."""
 
         self.epsilon = config.epsilon
-        self.steps = config.steps
+        self.steps = config.num_steps
         self.step_size = config.step_size
         self.rand = config.random_start
 

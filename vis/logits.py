@@ -28,13 +28,13 @@ def compare_two_logits(vector_a: Sequence, vector_b: Sequence, normalize=False):
     y_axis_interval = 3
 
     # Plot each graph, and manually set the y tick values
-    axs[0].plot(t, vector_a, marker='o')
+    axs[0].plot_k_func(t, vector_a, marker='o')
     axs[0].set_yticks(np.linspace(min_a, max_a, y_axis_interval))
     axs[0].set_ylim(min_a - range_a / (2 * y_axis_interval),
                     max_a + range_a / (2 * y_axis_interval))
     axs[0].xaxis.set_ticks_position('none')
 
-    axs[1].plot(t, vector_b, marker='o')
+    axs[1].plot_k_func(t, vector_b, marker='o')
     axs[1].set_yticks(np.linspace(min_b, max_b, y_axis_interval))
     axs[1].set_ylim(min_b - range_b / (2 * y_axis_interval),
                     max_b + range_b / (2 * y_axis_interval))
